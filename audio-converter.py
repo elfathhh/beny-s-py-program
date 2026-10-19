@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import subprocess
 import shutil
@@ -68,12 +68,31 @@ def main():
     print("=" * 50)
 
     if len(sys.argv) > 1:
-        video_path = sys.argv[1].strip().strip('"').strip("'")
+        folder_path = sys.argv[1].strip().strip('"').strip("'")
     else:
-        video_path = input("Masukkan path/lokasi file video: ").strip().strip('"').strip("'")
+        folder_path = input("Masukkan path/lokasi folder: ").strip().strip('"').strip("'")
 
-    if not video_path:
-        print("[PERINGATAN] Path video tidak boleh kosong.")
+    if not folder_path:
+        print("[PERINGATAN] Path folder tidak boleh kosong.")
+        return
+
+    dir_path = Path(folder_path).resolve()
+    if not dir_path.is_dir():
+        # Jika user memasukkan langsung path file yang valid, tetap toleransi atau cek
+        if dir_path.is_file():
+            video_path = dir_path
+        else:
+            print(f"[ERROR] Folder tidak ditemukan: {dir_path}")
+            return
+    else:
+        file_name = input("Masukkan nama file yang ingin di-convert (misal: video.mp4): ").strip().strip('"').strip("'")
+        if not file_name:
+            print("[PERINGATAN] Nama file tidak boleh kosong.")
+            return
+        video_path = dir_path / file_name
+
+    if not video_path.exists():
+        print(f"[ERROR] File tidak ditemukan di folder tersebut: {video_path}")
         return
 
     print("\nPilih format audio output:")
@@ -93,7 +112,7 @@ def main():
     }
     audio_format = format_mapping.get(pilihan, "mp3")
 
-    convert_video_to_audio(video_path, audio_format=audio_format)
+    convert_video_to_audio(str(video_path), audio_format=audio_format)
 
 if __name__ == "__main__":
     main()
